@@ -8,8 +8,8 @@ from crypto.encrypt import crypto
 from routers.login_functions import get_current_user
 from bull.work import process_transaction
 import json
-from fastapi_limiter import FastAPILimiter
-from fastapi_limiter.depends import RateLimiter
+# from fastapi_limiter import FastAPILimiter
+# from fastapi_limiter.depends import RateLimiter
 from bull.que import queue,add
 from routers.bot import alert_dev
 from routers.redis_function import redis,get_user_from_redis,set_user_in_redis,delete_user_from_redis,user_exists_in_redis
@@ -18,7 +18,7 @@ from routers.redis_function import redis,get_user_from_redis,set_user_in_redis,d
 router=APIRouter(prefix="/transaction",tags=["transaction"])
 # rate_limit: None = Depends(RateLimiter(times=5, seconds=60))
 @router.get("/balance")
-async def get_account_balance(user:dict=Depends(get_current_user),rate_limit: None = Depends(RateLimiter(times=2, seconds=60))):
+async def get_account_balance(user:dict=Depends(get_current_user)):
     user_id=user.get("user_id")
     # await FastAPILimiter.init(redis,identifier=user_id)
     print(user_id)
