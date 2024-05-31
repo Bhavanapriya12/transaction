@@ -16,9 +16,19 @@ from routers.redis_function import redis
 from fastapi_limiter import FastAPILimiter
 from fastapi import Header
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app=FastAPI(debug=True)
+
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.middleware("http")
 async def handle_exceptions(req: Request, next):
@@ -29,7 +39,7 @@ async def handle_exceptions(req: Request, next):
         alert_dev(f"HTTP Exception: {http_exception.detail}")
         raise HTTPException(status_code=http_exception.status_code, detail=str(http_exception.detail))
     except Exception as err:
-        alert_dev(f"Error occurred:❌❌❌❌ {str(err)}")
+        alert_dev(f"Error occurred:---❌❌❌❌ {str(err)}")
         print(err)
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(err)}")
 
@@ -40,7 +50,8 @@ app.include_router(transaction.router)
 
 
 async def identifier(request):
-    # if request.headers:
+    # if request.headers
+    # if request.headers
     token = request.headers.get("token")
     if token:
         token_bytes = token.encode('utf-8') 
@@ -58,19 +69,15 @@ async def identifier(request):
 async def startup():
     await FastAPILimiter.init(redis,identifier=identifier)
 
-# @app.on_event("startup")
-# @repeat_at(cron="0 0 * * *") 
-# async def hey():
-#     print("hey")
+@app.on_event("startup")
+@repeat_at(cron="0 0 * * *") 
+async def hey():
+    print("hey")
 
 # @app.on_event("startup")
 # @repeat_at(cron="*/10 * * * *") 
 # async def hey():
 #     print("hey")
-# @app.on_event("startup")
-# @repeat_at(cron= "*/10 * * * * *") 
-# async def hey():
-#     print("30")
 
 if __name__ == "__main__":
     import uvicorn
