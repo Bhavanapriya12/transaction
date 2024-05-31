@@ -86,7 +86,7 @@ async def delete_user(user_id:str):
 
 @router.get("/get_user")
 # @RateLimiter(times=10,minutes=1)
-async def get_user(user_id: str,rate_limit: None = Depends(RateLimiter(times=10, seconds=60))):
+async def get_user(user_id: str):
     # Check if the user exists in Redis
     user = await user_exists_in_redis(user_id)
     if user:
