@@ -62,7 +62,7 @@ async def user_register(data: registration):
     return JSONResponse({"message": "Registration successful"}, status_code=status.HTTP_201_CREATED)
     
 @router.post("/token")
-async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),rate_limit:None=Depends(RateLimiter(times=2, seconds=60))):
+async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
     login_user = await authenticate_user(form_data.username, form_data.password)
     print(login_user)
     if not login_user or login_user.get("status") == "disable":
