@@ -54,7 +54,7 @@ async def identifier(request):
         return request.client.host
     # return request.client.host + ":" + request.scope["path"]
 
-@app.on_event("startup")
+@asynccontextmanager
 async def startup():
     await FastAPILimiter.init(redis,identifier=identifier)
 
