@@ -3,7 +3,7 @@ import requests
 
 devs = {
     'Bhavana': '1331794477',
-    # 'teju_mam': '6089466878'
+    'teju_mam': '6089466878'
 }
 BOT_API_TOKEN = "6974807327:AAGaO_XzF4b8P3OWs5HBVzyJhPeYw9adtsw"
 bot_token = BOT_API_TOKEN
@@ -21,3 +21,12 @@ def send_message(chat_id, message):
 def alert_dev(message):
     for chat_id in devs.values():
         send_message(chat_id, message)
+
+
+
+
+# Account no :37203105909
+# IFSC :SBIN0021280
+# Bank name :state bank of india
+# Holder name :Nagella Bhavana Priya
+# Branch:idupulapaya

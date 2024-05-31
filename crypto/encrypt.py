@@ -54,3 +54,4 @@ class Crypto:
         except Exception as e:
             print("Error during decryption:", e)
             return 'error'
+crypto = Crypto()

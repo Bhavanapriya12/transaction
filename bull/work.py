@@ -25,7 +25,6 @@ async def process_transaction(job,token=None):
             raise ValueError("Transaction type not found in data")
         if transaction_type != "transaction":
             raise ValueError(f"Invalid job type: {transaction_type}")
-
         send = collection.find_one({"user_id": data["sender"]})
         receive = collection.find_one({"user_id": data["receiver"]})
         if not send or not receive:
@@ -36,6 +35,7 @@ async def process_transaction(job,token=None):
         
         collection.find_one_and_update({"user_id": send["user_id"]}, {"$inc": {"balance": -data["amount"]}})
         collection.find_one_and_update({"user_id": receive["user_id"]}, {"$inc": {"balance": data["amount"]}})
+
 
         transaction_record = {
             "transaction_id": generate_transaction_id(), 
