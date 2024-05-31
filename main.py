@@ -39,7 +39,7 @@ async def handle_exceptions(req: Request, next):
         alert_dev(f"HTTP Exception: {http_exception.detail}")
         raise HTTPException(status_code=http_exception.status_code, detail=str(http_exception.detail))
     except Exception as err:
-        alert_dev(f"Error occurred:---❌❌❌❌ {str(err)}")
+        alert_dev(f"Error occurred:❌❌❌❌ {str(err)}")
         print(err)
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(err)}")
 
