@@ -18,8 +18,6 @@ import string
 from routers.redis_function import redis
 from routers.login_functions import authenticate_user,create_access_token,get_current_user
 from routers.redis_function import set_user_in_redis,delete_user_from_redis,get_user_from_redis,user_exists_in_redis
-from fastapi_limiter import FastAPILimiter
-from fastapi_limiter.depends import RateLimiter
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="registration/token")
 
