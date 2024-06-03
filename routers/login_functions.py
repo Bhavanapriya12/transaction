@@ -12,7 +12,6 @@ from fastapi import Header
 from routers.redis_function import redis
 
 
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="registration/token")
 
 
