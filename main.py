@@ -17,6 +17,7 @@ from fastapi_limiter import FastAPILimiter
 from fastapi import Header
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
+from bull import work
 
 
 app=FastAPI(debug=True)
@@ -65,7 +66,8 @@ async def identifier(request):
         return request.client.host
     # return request.client.host + ":" + request.scope["path"]
 
-@asynccontextmanager
+# @asynccontextmanager
+@app.on_event("startup")
 async def startup():
     await FastAPILimiter.init(redis,identifier=identifier)
 

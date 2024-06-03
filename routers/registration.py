@@ -13,7 +13,7 @@ from crypto.encrypt import crypto
 import asyncio
 from crypto.tigerbalm import tige
 from routers.hash_functions import get_password_hash
-from fastapi_limiter import FastAPILimiter
+# from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
 
 import random
@@ -60,8 +60,7 @@ async def user_register(data: registration):
     
 # rate_limit:None=Depends(RateLimiter(times=2, seconds=60))
 @router.post("/token")
-async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),rate_limit:None=Depends(RateLimiter(times=2, seconds=60))):
-    await asyncio.sleep(30)
+async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),rate_limit:None=Depends(RateLimiter(times=10, seconds=10))):
     login_user = await authenticate_user(form_data.username, form_data.password)
     print(login_user)
     if not login_user or login_user.get("status") == "disable":
@@ -71,7 +70,6 @@ async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),rate_limit
     token = create_access_token(login_user["username"], login_user["user_id"],login_user["email"] ,expires_delta=token_expires)
 
     return {"access_token": token,"token_type": "bearer"}
-
 @router.delete("/delete_user")
 async def delete_user(user_id:str):
     use=await user_exists_in_redis(user_id)
