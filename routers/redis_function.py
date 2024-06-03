@@ -2,7 +2,7 @@ from redis.asyncio import Redis
 from typing import Optional
 
 
-redis = Redis(host="localhost", port=6379, decode_responses=True)
+# redis = Redis(host="localhost", port=6379, decode_responses=True)
 
 # redis = Redis(
 #   host='redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com',
