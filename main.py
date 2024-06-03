@@ -13,7 +13,7 @@ import logging
 from routers.bot import alert_dev
 import traceback
 from routers.redis_function import redis
-# from fastapi_limiter import FastAPILimiter
+from fastapi_limiter import FastAPILimiter
 from fastapi import Header
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
@@ -49,25 +49,25 @@ app.include_router(transaction.router)
 
 
 
-# async def identifier(request):
-#     # if request.headers
-#     # if request.headers
-#     token = request.headers.get("token")
-#     if token:
-#         token_bytes = token.encode('utf-8') 
-#         user = get_current_user(token_bytes)
-#         if user:
-#             user_id = user.get("user_id")
-#             return user_id
-#         raise HTTPException(status_code=401, detail="Unauthorized")
-#     else:
-#         print(request.client.host)
-#         return request.client.host
-#     # return request.client.host + ":" + request.scope["path"]
+async def identifier(request):
+    # if request.headers
+    # if request.headers
+    token = request.headers.get("token")
+    if token:
+        token_bytes = token.encode('utf-8') 
+        user = get_current_user(token_bytes)
+        if user:
+            user_id = user.get("user_id")
+            return user_id
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    else:
+        print(request.client.host)
+        return request.client.host
+    # return request.client.host + ":" + request.scope["path"]
 
-# @asynccontextmanager
-# async def startup():
-#     await FastAPILimiter.init(redis,identifier=identifier)
+@app.on_event("startup")
+async def startup():
+    await FastAPILimiter.init(redis,identifier=identifier)
 
 # @app.on_event("startup")
 # @repeat_at(cron="0 0 * * *") 

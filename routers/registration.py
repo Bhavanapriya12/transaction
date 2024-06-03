@@ -10,8 +10,12 @@ from datetime import datetime,timedelta
 import json
 from routers.bot import alert_dev
 from crypto.encrypt import crypto
+import asyncio
 from crypto.tigerbalm import tige
 from routers.hash_functions import get_password_hash
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
+
 import random
 import uuid
 import string
@@ -36,13 +40,6 @@ def generate_transaction_id():
 
 @router.post("/user_registration")
 async def user_register(data: registration):
-    # email =  collection.find_one({"email": data.email})
-    # if email and email["status"]=="enable":
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error occurred in user registration.Email already exists")
-    # phone_number = collection.find_one({"phone_number": data.phone_number})
-    # print(phone_number)
-    # if phone_number and phone_number["status"]=="enable":
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error occurred in user registration.Phone number already exists")
     password=get_password_hash(data.password)
     phone_number=tige.encrypt(data.phone_number)
 
@@ -61,8 +58,10 @@ async def user_register(data: registration):
     collection.insert_one(registration_record)  
     return JSONResponse({"message": "Registration successful"}, status_code=status.HTTP_201_CREATED)
     
+# rate_limit:None=Depends(RateLimiter(times=2, seconds=60))
 @router.post("/token")
-async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),rate_limit:None=Depends(RateLimiter(times=2, seconds=60))):
+    await asyncio.sleep(30)
     login_user = await authenticate_user(form_data.username, form_data.password)
     print(login_user)
     if not login_user or login_user.get("status") == "disable":
