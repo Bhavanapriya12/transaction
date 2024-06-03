@@ -59,5 +59,6 @@ async def send_amount(user_id: str, amount: int,user:dict=Depends(get_current_us
     
     r=await add("transaction",{ "sender": sender["user_id"], "receiver":user_id, "amount": amount}, 1)
     print(f"queue added-->{r.data}")
+    await process_transaction(r)
     return {"message": "Transaction request enqueued for processing"}
-    # process_transaction(r)
+  

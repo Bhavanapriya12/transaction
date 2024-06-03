@@ -22,7 +22,7 @@ async def process_transaction(job, token=None):
         # print('--->',[i for i in job])
         # print('dir-->',dir(job.name))
         # print('dir data-->',dir(job.data))
-    #     print("job details -->", dict(()
+        # print("job details -->", dict(()
         data = job.data
         print("jobdata--->", data)
         if isinstance(data, str):
