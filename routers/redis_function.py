@@ -8,7 +8,7 @@ redis = Redis(host="localhost", port=6379, decode_responses=True)
 #   host='redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com',
 #   port=19175,
 #   password='SUgs1JXtonLW8gV35QmNCNSOfKDq00gt')
-# redis=Redis(host="red-cper8mtds78s73flic1g",port=6379)
+redis=Redis(host="red-cper8mtds78s73flic1g",port=6379)
  
 async def set_user_in_redis(user_id: str, user_data: dict):
     await redis.hmset(user_id, mapping=user_data)
