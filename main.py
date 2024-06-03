@@ -7,7 +7,7 @@ from redis.exceptions import ConnectionError as RedisConnectionError
 from fastapi.responses import JSONResponse
 from fastapi import Depends
 from routers.login_functions import get_current_user
-from telegram import Bot
+# from telegram import Bot
 # from fastapi_utilities import repeat_every,repeat_at
 import logging
 from routers.bot import alert_dev

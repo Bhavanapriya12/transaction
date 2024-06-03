@@ -52,24 +52,24 @@ def create_access_token(username: str,user_id:str, email: str,
 
 def get_current_user(token: str = Header("token")):
     # print("get_current_user called")
-    try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ENCODING_ALGORITHM])
-        username: str = payload.get("username")
-        user_id: str = payload.get("user_id")
-        email: str = payload.get('email')
-        if email is None:
+    # try:
+    payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ENCODING_ALGORITHM])
+    username: str = payload.get("username")
+    user_id: str = payload.get("user_id")
+    email: str = payload.get('email')
+    if email is None:
+        raise get_user_exception()
+
+    if user_id is None:
+        user = collection.find_one({"email":email})
+        if not user:
             raise get_user_exception()
+        print(user)
+        user_id = user.user_id
 
-        if user_id is None:
-            user = collection.find_one({"email":email})
-            if not user:
-                raise get_user_exception()
-            print(user)
-            user_id = user.user_id
-
-        return {'username': username, 'user_id': user_id, 'email': email}
-    except jwt.ExpiredSignatureError:
-        raise get_user_exception(detail="Token has expired")
+    return {'username': username, 'user_id': user_id, 'email': email}
+    # except jwt.ExpiredSignatureError:
+    #     raise get_user_exception(detail="Token has expired")
     # except jwt.InvalidTokenError:
     #     raise get_user_exception(detail="Invalid token")
     # except Exception as e:
