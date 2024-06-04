@@ -8,11 +8,11 @@ from datetime import datetime
 from routers.registration import generate_transaction_id
 from redis.asyncio import Redis
 
-
 redis =Redis(
   host='redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com',
   port=19175,
   password='SUgs1JXtonLW8gV35QmNCNSOfKDq00gt')
+
 concurrency_limit = 1
 semaphore = asyncio.Semaphore(concurrency_limit)
 
