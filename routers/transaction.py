@@ -30,7 +30,7 @@ async def get_account_balance(user:dict=Depends(get_current_user),rate_limit: No
     
     user=collection.find_one({"user_id":user.get("user_id")})
     if user:
-        balance=crypto.encrypt(user["balance"])
+        balance=user["balance"]
         return JSONResponse({"message": "Balance fetched successfully", "data": balance}, status_code=status.HTTP_200_OK)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user not found for user_id to get the balance-->{user.get('user_id')}")
