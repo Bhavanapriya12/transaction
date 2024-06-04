@@ -14,7 +14,7 @@ async def post(payload):
 
     for _ in range(total_requests):
         payload = {'username': 'Sravani', 'password': 'Sravani123'}
-        response = requests.post("http://127.0.0.1:8000/registration/token", data=payload)
+        response = requests.post("https://transaction-6.onrender.com/registration/token", data=payload)
         print(response)
         if response.status_code == 200:
             data = response.json()
@@ -30,7 +30,7 @@ async def get(access_token):
     
     for _ in range(total_requests):
         header={"token":access_token}
-        response = requests.get('http://127.0.0.1:8000/transaction/balance',headers=header)
+        response = requests.get('https://transaction-6.onrender.com/transaction/balance',headers=header)
         data = response.json()
         time.sleep(time_between_requests)
         if data:

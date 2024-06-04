@@ -2,7 +2,10 @@ from bullmq import Queue
 import json
 import asyncio
 from routers.redis_function import redis
-# "redis://redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com:19175"
+# from redis.asyncio import Redis
+
+# redis_url="redis://redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com:19175"
+
 queue = Queue("myQueue")
 async def add(type,data, priority):
     try:
@@ -12,7 +15,7 @@ async def add(type,data, priority):
         print(data["type"])
         data= json.dumps(data)
         # priority={"priority": priority, "removeOnComplete": True, "removeOnFail": True}
-        priority={"connection": {"host": "redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com", "port": 19175},"priority": priority, "removeOnComplete": True, "removeOnFail": True}
+        priority={"connection":"redis://redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com:19175","priority": priority, "removeOnComplete": True, "removeOnFail": True}
         # Add job to the queue
         r = await queue.add(type,data,priority)
         print('Queue add response:', r)
