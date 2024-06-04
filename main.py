@@ -83,5 +83,6 @@ async def startup():
 
 if __name__ == "__main__":
     import uvicorn
+    from routers import redis_function
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
