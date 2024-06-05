@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field,validator
+from typing import Optional
 
 class registration(BaseModel):
     username: str
@@ -12,3 +13,13 @@ class login(BaseModel):
     username: str
     password: str
 
+class transaction(BaseModel):
+    amount: int
+    user_id: str
+    type:Optional[str]
+    transaction_id: Optional[str]
+    payment_mode: Optional[str]=Field(default="online")
+    payment_status: Optional[str]=Field(default="success")
+    payment_category: Optional[str]
+    transaction_date:Optional[str]
+    name: Optional[str]

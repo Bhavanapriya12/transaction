@@ -28,8 +28,15 @@ class TigerBalm:
         return hexlify(self.__cipher(self.salt, self.password).encrypt(self.__pad(data).encode('utf8')))
 
     def decrypt(self, data):
-        print('--->',self.__cipher(self.salt, self.password).decrypt(unhexlify(data)))
-        return self.__unpad(self.__cipher(self.salt, self.password).decrypt(unhexlify(data)).decode('utf8'))
+        try:
+
+            # print('--->',self.__cipher(self.salt, self.password).decrypt(unhexlify(data)))
+            decrypted_data=self.__unpad(self.__cipher(self.salt, self.password).decrypt(unhexlify(data)).decode('utf8'))
+            if decrypted_data is None:
+                raise ValueError("Decryption failed. Data may be corrupted or invalid.")
+            return decrypted_data
+        except Exception as e:
+            raise ValueError("Decryption failed. Error: {}".format(str(e)))
     def encrypt_obj(self, data):
         return hexlify(self.__cipher(self.salt, self.password).encrypt(self.__pad(json.dumps(data)).encode('utf8')))
 

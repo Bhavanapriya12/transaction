@@ -7,6 +7,8 @@ import json
 from datetime import datetime
 from routers.registration import generate_transaction_id
 from redis.asyncio import Redis
+from database import history
+from helpers.tigerbalm import tige
 
 redis =Redis(
   host='redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com',
@@ -43,28 +45,52 @@ async def process_transaction(job, token=None):
         
         collection.find_one_and_update({"user_id": send["user_id"]}, {"$inc": {"balance": -data["amount"]}})
         collection.find_one_and_update({"user_id": receive["user_id"]}, {"$inc": {"balance": data["amount"]}})
+        charges=0.01
+        charge=data["amount"]*charges
+        if send["user_id"] == data["sender"]:
+            # formatted_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            phone_number=tige.decrypt(send["phone_number"])
+            transaction_record={
+                
+                "transaction_id": generate_transaction_id(),
+                "user_id": send["user_id"]  ,
+                "amount": data["amount"],
+                "charges":charge,
+                "type": "debit" ,
+                "name":send["username"],
+                "receiver":receive["user_id"],
+                "sender":send["user_id"],
+                # "payment_mode":"online",
+                # "payment_status":"success",
+                "phone_number":send["phone_number"],
+                "email":send["email"],
+                "payment_category":data["payment_category"],
+                "transaction_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+            }
 
-        transaction_record = {
-            "transaction_id": generate_transaction_id(), 
+        history.insert_one(transaction_record)
+
+             
+        transaction={
+            "transaction_id":transaction_record.get("transaction_id"),
+            "user_id": receive["user_id"],
+            "charges":charge,
             "amount": data["amount"],
-            "timestamp": datetime.utcnow().isoformat(),
-            "type": "debit" if send["user_id"] == data["sender"] else "credit",
-            # "counterparty": data["receiver"] if send["user_id"] == data["sender"] else data["sender"]
+            "type": "credit",
+            "name":receive["username"],
+            # "payment_mode":"online",
+            # "payment_status":"success",
+            "phone_number":receive["phone_number"],
+            "email":receive["email"],
+            "payment_category":data["payment_category"],
+            "sender":send["user_id"],
+            "receiver":receive["user_id"],
+            "mode":"offline",
+            "transaction_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
-        # Update sender's transaction history
-        collection.find_one_and_update(
-            {"user_id": send["user_id"]},
-            {"$push": {"transaction_history": transaction_record}}
-        )
-        
-        # Update receiver's transaction history
-        transaction_record["type"] = "credit"
-        collection.find_one_and_update(
-            {"user_id": receive["user_id"]},
-            {"$push": {"transaction_history": transaction_record}}
-        )
+        history.insert_one(transaction)
         
         print("Transaction processed successfully:", data)
     # except Exception as e:

@@ -9,12 +9,17 @@ from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
 from datetime import datetime,timedelta
 import json
 from routers.bot import alert_dev
-from crypto.encrypt import crypto
+from helpers.encrypt import crypto
 import asyncio
-from crypto.tigerbalm import tige
+from helpers.tigerbalm import tige
 from routers.hash_functions import get_password_hash
 # from fastapi_limiter import FastAPILimiter
 from fastapi_limiter.depends import RateLimiter
+from database import history
+import pandas as pd
+from openpyxl import Workbook
+from io import BytesIO
+from fastapi.responses import FileResponse
 
 import random
 import uuid
@@ -30,7 +35,9 @@ router=APIRouter(prefix="/registration",tags=["registration"])
 
 def generate_user_id():
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=3))
+    print(random_string)
     uuid_string = str(uuid.uuid4()).replace('-', '')[:3]
+    print(uuid_string)
     return random_string + uuid_string
 
 def generate_transaction_id():
@@ -50,13 +57,15 @@ async def user_register(data: registration):
         "phone_number":phone_number,
         "status":"enable",
         "balance":data.balance
+        
     }
     user_id = generate_user_id()
     await set_user_in_redis(user_id,registration_record)
     registration_record["user_id"]=user_id
+    phone=tige.decrypt(registration_record["phone_number"])
 
     collection.insert_one(registration_record)  
-    return JSONResponse({"message": "Registration successful"}, status_code=status.HTTP_201_CREATED)
+    return JSONResponse({"message": "Registration successful","data":phone}, status_code=status.HTTP_201_CREATED)
     
 # rate_limit:None=Depends(RateLimiter(times=2, seconds=60))
 @router.post("/token")
@@ -111,3 +120,44 @@ async def get_user(user_id: str):
         {"message": "Successfully retrieved user by user id", "data": encrypted_data},
         status_code=status.HTTP_200_OK
     )
+
+
+@router.get("/excel_file")
+async def excel_download(user:dict=Depends(get_current_user)):
+    user_records= history.find({"user_id": user.get("user_id")})
+    # print(user_records)
+    if not user_records:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User not found for user_id {user.get('user_id')}"
+        )
+    
+    transaction_data=[dict(user_record) for user_record in user_records]
+    for transactions in transaction_data:
+        transactions["_id"] = str(transactions["_id"])
+        transactions["phone_number"]=tige.decrypt(transactions["phone_number"])
+
+    
+
+    
+    output = "transactions.xlsx"
+    df=pd.DataFrame(transaction_data)
+    df.drop(columns=["_id"], inplace=True)
+    print(df)
+
+    wb = Workbook()
+    ws = wb.active
+    ws.append(df.columns.tolist())
+    for row in df.itertuples(index=False, name=None):
+        ws.append(row)
+
+
+    # pd.ExcelWriter("transactions.xlsx")
+    writer = pd.ExcelWriter(output, engine='openpyxl')
+    df.to_excel(writer, index=False)
+    wb.save(output)
+    # print(output)
+
+    return FileResponse(output, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",filename=output)
+    
+    
