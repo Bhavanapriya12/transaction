@@ -31,18 +31,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.middleware("http")
-async def handle_exceptions(req: Request, next):
-    try:
-        res = await next(req)
-        return res
-    except HTTPException as http_exception:
-        alert_dev(f"HTTP Exception: {http_exception.detail}")
-        raise HTTPException(status_code=http_exception.status_code, detail=str(http_exception.detail))
-    except Exception as err:
-        alert_dev(f"Error occurred:❌❌❌❌ {str(err)}")
-        print(err)
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(err)}")
+# @app.middleware("http")
+# async def handle_exceptions(req: Request, next):
+#     try:
+#         res = await next(req)
+#         return res
+#     except HTTPException as http_exception:
+#         alert_dev(f"HTTP Exception: {http_exception.detail}")
+#         raise HTTPException(status_code=http_exception.status_code, detail=str(http_exception.detail))
+#     except Exception as err:
+#         alert_dev(f"Error occurred:❌❌❌❌ {str(err)}")
+#         print(err)
+#         raise HTTPException(status_code=500, detail=f"Internal server error: {str(err)}")
 
 app.include_router(registration.router)
 app.include_router(transaction.router)

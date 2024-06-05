@@ -9,6 +9,8 @@ from routers.registration import generate_transaction_id
 from redis.asyncio import Redis
 from database import history
 from helpers.tigerbalm import tige
+from routers.balance_limit import cash
+from validators.user_validator import CashLimit,cash_limit
 
 redis =Redis(
   host='redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com',
@@ -43,13 +45,15 @@ async def process_transaction(job, token=None):
         if send["balance"] < data["amount"]:
             raise HTTPException(status_code=400, detail="Insufficient balance")
         
+        cash(cash_limit,user_id=send["user_id"],amount=data["amount"],cash_type="debit")
+        cash(cash_limit,user_id=receive["user_id"],amount=data["amount"],cash_type="credit")
         collection.find_one_and_update({"user_id": send["user_id"]}, {"$inc": {"balance": -data["amount"]}})
         collection.find_one_and_update({"user_id": receive["user_id"]}, {"$inc": {"balance": data["amount"]}})
         charges=0.01
         charge=data["amount"]*charges
         if send["user_id"] == data["sender"]:
             # formatted_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            phone_number=tige.decrypt(send["phone_number"])
+            # phone_number=tige.decrypt(send["phone_number"])
             transaction_record={
                 
                 "transaction_id": generate_transaction_id(),

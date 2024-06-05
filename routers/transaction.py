@@ -37,16 +37,16 @@ async def get_account_balance(user:dict=Depends(get_current_user),rate_limit: No
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user not found for user_id to get the balance-->{user.get('user_id')}")
 @router.put("/transaction")
 async def send_amount(data:transaction,user:dict=Depends(get_current_user)):
-    sender=user.get("user_id")
-    use= await user_exists_in_redis(sender)
-    if use:
-        receiver=await user_exists_in_redis(data.user_id)
-        if  await redis.hget(sender,"balance") < str(data.amount):
-            raise HTTPException(status_code=400, detail="Insufficient balance")
+    # sender=user.get("user_id")
+    # use= await user_exists_in_redis(sender)
+    # if use:
+    #     receiver=await user_exists_in_redis(data.user_id)
+    #     if  await redis.hget(sender,"balance") < str(data.amount):
+    #         raise HTTPException(status_code=400, detail="Insufficient balance")
         
-        r=await add("transaction", {"sender": sender, "receiver":data.user_id, "amount": data.amount},1)
-        print(f"queue added-->{r}")
-        return {"message": "Transaction request enqueued for processing"}
+    #     r=await add("transaction", {"sender": sender, "receiver":data.user_id, "amount": data.amount},1)
+    #     print(f"queue added-->{r}")
+    #     return {"message": "Transaction request enqueued for processing"}
 
     sender = collection.find_one({"user_id": user.get("user_id")})
     print(sender)

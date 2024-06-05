@@ -5,7 +5,7 @@ client = MongoClient("mongodb+srv://Bhavana:Bhavana12@codegene.usxjnqx.mongodb.n
 db = client["users"]
 collection = db["user"]
 history=db["transaction"]
-
+limit=db["limits"]
 # if "history" not in db.list_collection_names():
 #     validator= {
 #         "$jsonSchema": {
