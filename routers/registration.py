@@ -18,7 +18,6 @@ from fastapi_limiter.depends import RateLimiter
 from database import history
 import pandas as pd
 from openpyxl import Workbook
-from io import BytesIO
 from fastapi.responses import FileResponse
 
 import random
