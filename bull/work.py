@@ -8,9 +8,23 @@ from datetime import datetime
 from routers.registration import generate_transaction_id
 from redis.asyncio import Redis
 from database import history
-from helpers.tigerbalm import tige
-from routers.balance_limit import cash
-from validators.user_validator import CashLimit,cash_limit
+# from helpers.tigerbalm import tige
+# from routers.balance_limit import cash
+# from validators.user_validator import CashLimit,cash_limit 
+import logging
+from datetime import datetime
+
+logging.basicConfig(filename='transaction_logs.txt', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def log_transaction(sender, receiver, amount, success=True):
+    if success:
+        logging.info(f"Transaction successful - Sender: {sender}, Receiver: {receiver}, Amount: {amount}")
+    else:
+        logging.error(f"Transaction failed - Sender: {sender}, Receiver: {receiver}, Amount: {amount}")
+
+
+# error_logger = logger.error('error', logging.ERROR)
+# info_logger = logger.info('info', logging.INFO)
 
 redis =Redis(
   host='redis-19175.c14.us-east-1-2.ec2.redns.redis-cloud.com',
@@ -27,6 +41,7 @@ async def process_transaction(job, token=None):
         # print('dir-->',dir(job.name))
         # print('dir data-->',dir(job.data))
         # print("job details -->", dict(()
+    try:
         data = job.data
         print("jobdata--->", data)
         if isinstance(data, str):
@@ -45,10 +60,20 @@ async def process_transaction(job, token=None):
         if send["balance"] < data["amount"]:
             raise HTTPException(status_code=400, detail="Insufficient balance")
         
-        cash(cash_limit,user_id=send["user_id"],amount=data["amount"],cash_type="debit")
-        cash(cash_limit,user_id=receive["user_id"],amount=data["amount"],cash_type="credit")
+        # cash(cash_limit,user_id=send["user_id"],amount=data["amount"],cash_type="debit")
+        # cash(cash_limit,user_id=receive["user_id"],amount=data["amount"],cash_type="credit")
         collection.find_one_and_update({"user_id": send["user_id"]}, {"$inc": {"balance": -data["amount"]}})
         collection.find_one_and_update({"user_id": receive["user_id"]}, {"$inc": {"balance": data["amount"]}})
+
+        send["cashout_daily_used"] += data["amount"]
+        send["cashout_monthly_used"] += data["amount"]
+        send["cashout_yearly_used"] += data["amount"]
+        collection.update_one({"user_id": send["user_id"]}, {"$set": send})
+        receive["cashin_daily_used"] += data["amount"]
+        receive["cashin_monthly_used"] += data["amount"]
+        receive["cashin_yearly_used"] += data["amount"]
+        collection.update_one({"user_id": receive["user_id"]}, {"$set": receive})
+
         charges=0.01
         charge=data["amount"]*charges
         if send["user_id"] == data["sender"]:
@@ -95,9 +120,10 @@ async def process_transaction(job, token=None):
         }
 
         history.insert_one(transaction)
-        
+        log_transaction(send["user_id"],receive["user_id"],data["amount"])
         print("Transaction processed successfully:", data)
-    # except Exception as e:
-    #     print("Error processing transaction:", str(e))
+    except Exception as err:
+        log_transaction(send["user_id"],receive["user_id"],data["amount"],success=False)
+        raise err
 
 worker = Worker(name="myQueue", processor=process_transaction, opts={"connection":redis})

@@ -1,0 +1,3 @@
+2024-06-07 18:01:28,116 - ERROR - Transaction failed - Sender: 5mt298, Receiver: FAK69d, Amount: 2
+2024-06-07 18:01:57,121 - INFO - Transaction successful - Sender: 5mt298, Receiver: FAK69d, Amount: 2
+2024-06-07 18:08:44,879 - INFO - Transaction successful - Sender: 5mt298, Receiver: FAK69d, Amount: 2

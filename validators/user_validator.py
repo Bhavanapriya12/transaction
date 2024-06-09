@@ -7,6 +7,19 @@ class registration(BaseModel):
     email: EmailStr
     phone_number: str = Field(..., min_length=10, max_length=10,description="Phone number must be 10 digits")
     balance: int
+    cashout_daily_limit:Optional[int]=Field(default=300)
+    cashout_monthly_limit:Optional[int]=Field(default=3000)
+    cashout_yearly_limit:Optional[int]=Field(default=30000)
+    cashout_daily_used:Optional[int]=Field(default=0)
+    cashout_monthly_used:Optional[int]=Field(default=0)
+    cashout_yearly_used:Optional[int]=Field(default=0)
+    cashin_daily_limit:Optional[int]=Field(default=300)
+    cashin_monthly_limit:Optional[int]=Field(default=3000)
+    cashin_yearly_limit:Optional[int]=Field(default=30000)
+    cashin_daily_used:Optional[int]=Field(default=0)
+    cashin_monthly_used:Optional[int]=Field(default=0)
+    cashin_yearly_used:Optional[int]=Field(default=0)
+
 
 
 class login(BaseModel):
@@ -23,32 +36,32 @@ class transaction(BaseModel):
     payment_category: Optional[str]
     transaction_date:Optional[str]
     name: Optional[str]
-class CashLimit(BaseModel):
-    cashout_daily_limit:int=Field(default=300)
-    cashout_monthly_limit:int=Field(default=3000)
-    cashout_yearly_limit:int=Field(default=30000)
-    cashout_daily_used:int=Field(default=0)
-    cashout_monthly_used:int=Field(default=0)
-    cashout_yearly_used:int=Field(default=0)
-    cashin_daily_limit:int=Field(default=300)
-    cashin_monthly_limit:int=Field(default=3000)
-    cashin_yearly_limit:int=Field(default=30000)
-    cashin_daily_used:int=Field(default=0)
-    cashin_monthly_used:int=Field(default=0)
-    cashin_yearly_used:int=Field(default=0)
+# class CashLimit(BaseModel):
+#     cashout_daily_limit:int=Field(default=300)
+#     cashout_monthly_limit:int=Field(default=3000)
+#     cashout_yearly_limit:int=Field(default=30000)
+#     cashout_daily_used:int=Field(default=0)
+#     cashout_monthly_used:int=Field(default=0)
+#     cashout_yearly_used:int=Field(default=0)
+#     cashin_daily_limit:int=Field(default=300)
+#     cashin_monthly_limit:int=Field(default=3000)
+#     cashin_yearly_limit:int=Field(default=30000)
+#     cashin_daily_used:int=Field(default=0)
+#     cashin_monthly_used:int=Field(default=0)
+#     cashin_yearly_used:int=Field(default=0)
 
 
-cash_limit = CashLimit(
-    cashout_daily_limit=300,
-    cashout_monthly_limit=3000,
-    cashout_yearly_limit=30000,
-    cashout_daily_used=0,
-    cashout_monthly_used=0,
-    cashout_yearly_used=0,
-    cashin_daily_limit=300,
-    cashin_monthly_limit=3000,
-    cashin_yearly_limit=30000,
-    cashin_daily_used=0,
-    cashin_monthly_used=0,
-    cashin_yearly_used=0,
-)
+# cash_limit = CashLimit(
+#     cashout_daily_limit=300,
+#     cashout_monthly_limit=3000,
+#     cashout_yearly_limit=30000,
+#     cashout_daily_used=0,
+#     cashout_monthly_used=0,
+#     cashout_yearly_used=0,
+#     cashin_daily_limit=300,
+#     cashin_monthly_limit=3000,
+#     cashin_yearly_limit=30000,
+#     cashin_daily_used=0,
+#     cashin_monthly_used=0,
+#     cashin_yearly_used=0,
+# )

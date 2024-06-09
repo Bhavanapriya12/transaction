@@ -11,8 +11,18 @@ from fastapi_limiter.depends import RateLimiter
 from validators.user_validator import transaction
 import json
 from bull.que import queue,add
+from routers.balance_limit import cash
 from routers.bot import alert_dev
 from routers.redis_function import redis,get_user_from_redis,set_user_in_redis,delete_user_from_redis,user_exists_in_redis
+# from fastapi.logger import logger as Logger
+# import logging
+
+# error_logger = Logger.get_logger('error', logging.ERROR)
+# info_logger = Logger.get_logger('info', logging.INFO)
+
+
+
+
 
 
 router=APIRouter(prefix="/transaction",tags=["transaction"])
@@ -57,6 +67,10 @@ async def send_amount(data:transaction,user:dict=Depends(get_current_user)):
         raise HTTPException(status_code=404, detail=f"User not found for receiver user_id")
     if sender["balance"] < data.amount:
         raise HTTPException(status_code=400, detail="Insufficient balance")
+    response=await cash(sender["user_id"],receiver["user_id"],data.amount)
+    if response["status_code"] == 400:
+        print(response["status_code"])
+        raise HTTPException(status_code=response["status_code"], detail=response["message"])
     
     r=await add("transaction",{ "sender": sender["user_id"], "receiver":data.user_id, "amount": data.amount,"payment_category":data.payment_category}, 1)
     print(f"queue added-->{r.data}")

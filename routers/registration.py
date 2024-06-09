@@ -7,9 +7,11 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
 from datetime import datetime,timedelta
+import os
 import json
 from routers.bot import alert_dev
 from helpers.encrypt import crypto
+import base64
 import asyncio
 from helpers.tigerbalm import tige
 from routers.hash_functions import get_password_hash
@@ -19,10 +21,12 @@ from database import history
 import pandas as pd
 from openpyxl import Workbook
 from fastapi.responses import FileResponse
-
+from fastapi import UploadFile,File
 import random
 import uuid
 import string
+from bson import Binary
+from base64 import b64encode
 from routers.redis_function import redis
 from routers.login_functions import authenticate_user,create_access_token,get_current_user
 from routers.redis_function import set_user_in_redis,delete_user_from_redis,get_user_from_redis,user_exists_in_redis
@@ -55,8 +59,20 @@ async def user_register(data: registration):
         "email":data.email,
         "phone_number":phone_number,
         "status":"enable",
-        "balance":data.balance
-        
+        "balance":data.balance,
+        "cashout_daily_limit":data.cashout_daily_limit,
+        "cashout_monthly_limit":data.cashout_monthly_limit,
+        "cashout_yearly_limit":data.cashout_yearly_limit,
+        "cashout_daily_used":data.cashout_daily_used,
+        "cashout_monthly_used":data.cashout_monthly_used,
+        "cashout_yearly_used":data.cashout_yearly_used,
+        "cashin_daily_limit":data.cashin_daily_limit,
+        "cashin_monthly_limit":data.cashin_monthly_limit,
+        "cashin_yearly_limit":data.cashin_yearly_limit,
+        "cashin_daily_used":data.cashin_daily_used,
+        "cashin_monthly_used":data.cashin_monthly_used,
+        "cashin_yearly_used":data.cashin_yearly_used,
+
     }
     user_id = generate_user_id()
     await set_user_in_redis(user_id,registration_record)
@@ -159,4 +175,44 @@ async def excel_download(user:dict=Depends(get_current_user)):
 
     return FileResponse(output, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",filename=output)
     
+
+
+@router.post("/upload_image")
+async def upload_image(image_file:UploadFile=File(...),user:dict=Depends(get_current_user)):
+
+
+    user_id=user.get("user_id")
+    user=collection.find_one({"user_id":user_id})
+    # print(user)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User not found for user_id {user_id}"
+        )
+    image_data = await image_file.read()
+    if len(image_data) > 141*1024:
+        print(len(image_data))
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message": "Image size exceeds 141kb."})
+    print(len(image_data))
+    FOLDER = "images/" + user_id
+    folder_path = os.path.join(os.getcwd(), FOLDER)
+    print(folder_path)
+    os.makedirs(folder_path, exist_ok=True)
     
+    
+    
+    image_path = os.path.join(folder_path, image_file.filename)
+
+    with open(image_path, "wb") as file:
+        file.write(image_data)
+
+    base64_encoded_data = base64.b64encode(image_data).decode('utf-8')
+    data_url = f"data:image/png;base64,{base64_encoded_data}"
+
+    
+    # data= base64_encoded_data
+    # print(data_url)
+
+    collection.update_one({'user_id': user_id}, {'$set': {'image': data_url}})
+    
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Image uploaded successfully"}) 
