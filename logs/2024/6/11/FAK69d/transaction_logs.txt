@@ -1,0 +1,4 @@
+2024-06-11 14:57:50 - INFO - Transaction successful, amount=500, balance: Before transaction-600, route:transaction/transaction
+2024-06-11 14:57:50 - INFO - Transaction successful, amount=500, balance: After_transaction-100, route:transaction/transaction
+2024-06-11 15:06:20 - INFO - Transaction successful, amount=50, balance: Before transaction-100, route:transaction/transaction
+2024-06-11 15:06:20 - INFO - Transaction successful, amount=50, balance: After_transaction-50, route:transaction/transaction

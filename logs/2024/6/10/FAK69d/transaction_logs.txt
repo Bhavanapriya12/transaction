@@ -1,0 +1,3 @@
+2024-06-10 17:22:15 - INFO - Transaction successful - Sender: FAK69d, Receiver: 5mt298, Amount: 5, Sender Amount Before: 6, Sender Amount After: 11, Receiver Amount Before: 10, Receiver Amount After: 1, Trasaction occurred in:http://127.0.0.1:8000/transaction/transaction
+2024-06-10 17:22:38 - INFO - Transaction successful - Sender: FAK69d, Receiver: 5mt298, Amount: 4, Sender Amount Before: 5, Sender Amount After: 12, Receiver Amount Before: 11, Receiver Amount After: 1, Trasaction occurred in:http://127.0.0.1:8000/transaction/transaction
+2024-06-10 18:12:15 - INFO - Transaction successful,amount=1Sender Amount Before: 2, Sender Amount After: 5mt298, route:transaction/transaction

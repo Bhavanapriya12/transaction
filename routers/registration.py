@@ -86,7 +86,7 @@ async def user_register(data: registration):
 @router.post("/token")
 async def user_login(form_data: OAuth2PasswordRequestForm = Depends(),rate_limit:None=Depends(RateLimiter(times=10, seconds=10))):
     login_user = await authenticate_user(form_data.username, form_data.password)
-    print(login_user)
+    # print(login_user)
     if not login_user or login_user.get("status") == "disable":
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
     

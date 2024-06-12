@@ -24,7 +24,7 @@ async def authenticate_user(username: str, password: str):
     
     if user_data:
         user_data = json.loads(user_data)
-        print(user_data)
+        # print(user_data)
         if verify_password(password, user_data['password']):
             return user_data
         else:
@@ -63,7 +63,7 @@ def get_current_user(token: str = Header("token")):
         user = collection.find_one({"email":email})
         if not user:
             raise get_user_exception()
-        print(user)
+        # print(user)
         user_id = user.user_id
 
     return {'username': username, 'user_id': user_id, 'email': email}
